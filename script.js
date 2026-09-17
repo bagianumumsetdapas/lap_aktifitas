@@ -262,7 +262,7 @@ async function unlockPegawaiSelectBox() {
         populatePegawaiDropdown(pegawaiDataList);
     } catch (err) {
         pegawaiDataList = [
-            { nama: "MOCH. YUNUS", nip: "197206252014061001", pangkatGol: "PENGATUR (II/c)", jabatan: "OPERATOR LAYANAN OPERASIONAL", lokasiKerja: "Kantor Bupati Pasuruan", kegiatan: "Melaksanakan layanan operasional keprotokolan kegiatan Bupati dan Wakil Bupati" }
+            { nama: "AKHMAD MUTTAQIE", nip: "199809252025211001", pangkatGol: "V", jabatan: "OPERATOR LAYANAN OPERASIONAL", lokasiKerja: "Kantor Bupati Pasuruan", kegiatan: "Menerima, merekap surat masuk/keluar dan menyiapkan agenda kegiatan pimpinan Asisten Perekonomian dan Pembangunan" }
         ];
         populatePegawaiDropdown(pegawaiDataList);
     }
@@ -385,24 +385,24 @@ async function handleExportPDF(actionType) {
             const img2 = photoStorage[`m${i}_f2`] || '';
 
             mingguListP1.innerHTML += `
-                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
                     <!-- Full Width Center Green Badge Header -->
-                    <div style="background-color: #059669; color: #ffffff; font-size: 9.5px; font-weight: 700; padding: 3px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 6px; text-transform: uppercase;">
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 8px; text-transform: uppercase;">
                         Minggu ${getRoman(i)} - (${bulanLaporFull})
                     </div>
                     
-                    <div style="font-size: 9.5px; color: #374151; line-height: 1.35; margin-bottom: 6px;">
+                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 8px;">
                         <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
                         <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
                     </div>
 
-                    <!-- Reduced Height Proportional Photos Grid (max-height: 110px) -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div style="height: 110px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 8.5px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                    <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height: 110px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 8.5px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
@@ -428,13 +428,13 @@ async function handleExportPDF(actionType) {
                         <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
                     </div>
 
-                    <!-- Reduced Height Proportional Photos Grid (max-height: 135px) -->
+                    <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="height: 135px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height: 135px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
@@ -448,13 +448,13 @@ async function handleExportPDF(actionType) {
         const cleanNama = selectedPegawai.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim();
         const filename = `${cleanNama} - ${bulan.toUpperCase()} 2026.pdf`;
 
-        // Exact html2pdf config to prevent extra blank pages
+        // Exact F4 Paper Size (215mm x 330mm)
         const opt = {
             margin: 0,
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            jsPDF: { unit: 'mm', format: [215, 330], orientation: 'portrait' }
         };
 
         if (actionType === 'download') {

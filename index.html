@@ -88,7 +88,7 @@
                 </button>
             </div>
 
-            <!-- Form Pilihan Pegawai (Inisial tersembunyi sampai Passcode valid) -->
+            <!-- Form Pilihan Pegawai -->
             <div id="pegawai-select-box" class="space-y-4 hidden opacity-0 transition-all duration-500 bg-white dark:bg-gray-800/80 p-6 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-sm scroll-mt-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-3">
@@ -111,7 +111,6 @@
                     <div class="md:col-span-2">
                         <label class="block text-xs font-semibold mb-1.5 text-gray-700 dark:text-gray-300">Bulan Laporan</label>
                         <select id="select-bulan" class="w-full p-3 rounded-xl bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <!-- Populated dynamically -->
                         </select>
                     </div>
                 </div>
@@ -155,13 +154,11 @@
                 </h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Loop 4 Minggu -->
                     <template id="tpl-minggu">
                         <div class="bg-white dark:bg-gray-800/80 p-4 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-sm space-y-3">
                             <span class="minggu-title text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider block">Minggu Ke-1</span>
                             
                             <div class="grid grid-cols-2 gap-3">
-                                <!-- Box Foto A -->
                                 <div class="photo-box relative aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-emerald-500 bg-gray-50 dark:bg-gray-700/50 overflow-hidden flex flex-col items-center justify-center cursor-pointer transition group">
                                     <input type="file" accept="image/*" class="file-input absolute inset-0 opacity-0 cursor-pointer z-10">
                                     <div class="placeholder-content text-center p-2">
@@ -174,7 +171,6 @@
                                     </button>
                                 </div>
 
-                                <!-- Box Foto B -->
                                 <div class="photo-box relative aspect-[4/3] rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-emerald-500 bg-gray-50 dark:bg-gray-700/50 overflow-hidden flex flex-col items-center justify-center cursor-pointer transition group">
                                     <input type="file" accept="image/*" class="file-input absolute inset-0 opacity-0 cursor-pointer z-10">
                                     <div class="placeholder-content text-center p-2">
@@ -223,12 +219,12 @@
 
     </div>
 
-    <!-- PREVIEW PDF TEMPLATE - FIXED RELATIVE OVERFLOW CONTAINER FOR PROPER 2-PAGE PRINTING -->
-    <div style="position: absolute; left: -9999px; top: 0; width: 210mm;">
-        <div id="pdf-template" style="width: 210mm; background-color: #ffffff; color: #1f2937; font-family: 'Poppins', sans-serif; box-sizing: border-box;">
+    <!-- PREVIEW PDF TEMPLATE - F4 PAPER SIZE (215mm x 330mm) STRICT CONTAINMENT -->
+    <div style="position: absolute; left: -9999px; top: 0; width: 215mm;">
+        <div id="pdf-template" style="width: 215mm; background-color: #ffffff; color: #1f2937; font-family: 'Poppins', sans-serif; box-sizing: border-box;">
             
-            <!-- PAGE 1: DOKUMEN LAPORAN & MINGGU I - II -->
-            <div style="width: 210mm; height: 295mm; padding: 12mm 15mm; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; page-break-after: always; background: #ffffff;">
+            <!-- HALAMAN 1: DOKUMEN LAPORAN & MINGGU I - II -->
+            <div style="width: 215mm; height: 328mm; padding: 10mm 15mm; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; page-break-after: always; background: #ffffff;">
                 <div>
                     <!-- Header Kop PDF -->
                     <div style="display: flex; align-items: center; justify-content: center; gap: 14px; border-bottom: 2px solid #065f46; padding-bottom: 8px; margin-bottom: 12px;">
@@ -241,10 +237,10 @@
                     </div>
 
                     <!-- Identitas Pegawai Grid -->
-                    <div style="background-color: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px;">
-                        <table style="width: 100%; font-size: 10px; border-collapse: collapse; line-height: 1.5;">
+                    <div style="background-color: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+                        <table style="width: 100%; font-size: 10px; border-collapse: collapse; line-height: 1.6;">
                             <tr>
-                                <td style="width: 22%; font-weight: 600; color: #065f46;">Nama</td>
+                                <td style="width: 20%; font-weight: 600; color: #065f46;">Nama</td>
                                 <td style="width: 2%; font-weight: 600; color: #065f46;">:</td>
                                 <td id="pdf-val-nama" style="font-weight: 600; color: #111827;"></td>
                             </tr>
@@ -272,34 +268,20 @@
                     </div>
 
                     <!-- List Minggu I & II -->
-                    <div id="pdf-minggu-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div id="pdf-minggu-list" style="display: flex; flex-direction: column; gap: 12px;">
                         <!-- Rendered via JS -->
                     </div>
                 </div>
 
-                <!-- Footer Tanda Tangan & Page Number -->
-                <div style="margin-top: 6px;">
-                    <div style="display: flex; justify-content: flex-end; margin-bottom: 4px;">
-                        <div style="text-align: center; width: 200px;">
-                            <p id="pdf-val-tanggal" style="font-size: 10px; color: #374151; margin-bottom: 2px;">Pasuruan, -- ---- 2026</p>
-                            <p style="font-size: 10px; font-weight: 600; color: #111827; margin: 0;">Yang melaporkan,</p>
-                            <div style="height: 48px; display: flex; align-items: center; justify-content: center; margin: 2px 0;">
-                                <img id="pdf-img-sig" style="max-height: 48px; max-width: 100%; object-fit: contain;">
-                            </div>
-                            <p id="pdf-val-ttd-nama" style="font-size: 10px; font-weight: 700; color: #064e3b; text-decoration: underline; margin: 0;">NAMA PEGAWAI</p>
-                            <p id="pdf-val-ttd-nip" style="font-size: 9px; color: #4b5563; margin: 1px 0 0 0;">NIP. -</p>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 4px; font-size: 8.5px; color: #9ca3af;">
-                        <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
-                        <span style="font-weight: 600; color: #4b5563;">Halaman 1/2</span>
-                    </div>
+                <!-- Footer Page 1 -->
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 8.5px; color: #9ca3af;">
+                    <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
+                    <span style="font-weight: 600; color: #4b5563;">Halaman 1/2</span>
                 </div>
             </div>
 
-            <!-- PAGE 2: MINGGU III & IV -->
-            <div style="width: 210mm; height: 295mm; padding: 12mm 15mm; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background: #ffffff;">
+            <!-- HALAMAN 2: MINGGU III & IV DAN TANDA TANGAN DI BAGIAN BAWAH HALAMAN TERAKHIR -->
+            <div style="width: 215mm; height: 328mm; padding: 10mm 15mm; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; background: #ffffff;">
                 <div>
                     <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #065f46; padding-bottom: 6px; margin-bottom: 12px;">
                         <h4 style="font-size: 11px; font-weight: 700; color: #064e3b; text-transform: uppercase; margin: 0;">
@@ -313,9 +295,24 @@
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 4px; font-size: 8.5px; color: #9ca3af;">
-                    <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
-                    <span style="font-weight: 600; color: #4b5563;">Halaman 2/2</span>
+                <!-- Footer Tanda Tangan & Page Number Halaman Terakhir -->
+                <div>
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <div style="text-align: center; width: 220px;">
+                            <p id="pdf-val-tanggal" style="font-size: 10px; color: #374151; margin-bottom: 2px;">Pasuruan, -- ---- 2026</p>
+                            <p style="font-size: 10px; font-weight: 600; color: #111827; margin: 0;">Yang melaporkan,</p>
+                            <div style="height: 52px; display: flex; align-items: center; justify-content: center; margin: 4px 0;">
+                                <img id="pdf-img-sig" style="max-height: 52px; max-width: 100%; object-fit: contain;">
+                            </div>
+                            <p id="pdf-val-ttd-nama" style="font-size: 10px; font-weight: 700; color: #064e3b; text-decoration: underline; margin: 0;">NAMA PEGAWAI</p>
+                            <p id="pdf-val-ttd-nip" style="font-size: 9px; color: #4b5563; margin: 1px 0 0 0;">NIP. -</p>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 8.5px; color: #9ca3af;">
+                        <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
+                        <span style="font-weight: 600; color: #4b5563;">Halaman 2/2</span>
+                    </div>
                 </div>
             </div>
 
