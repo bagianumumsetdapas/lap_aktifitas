@@ -1,0 +1,29 @@
+/* Soft Clean Color Palette & Styling */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Custom rounded frame for photo previews */
+.img-preview {
+    border-radius: 0.75rem;
+    object-fit: cover;
+}
+
+/* Auto-crop CSS for portrait images */
+.photo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Page break enforcement for PDF generation */
+.page-break-before {
+    page-break-before: always;
+}
+
+/* Prevent scrolling/pull-to-refresh when drawing on signature canvas */
+#signature-pad {
+    touch-action: none;
+}
