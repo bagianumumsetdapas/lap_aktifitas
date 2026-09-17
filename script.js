@@ -85,14 +85,13 @@ function checkNetworkStatus() {
     update();
 }
 
-// Fine stroke width for refined signatures
 function initSignaturePad() {
     const canvas = document.getElementById('signature-pad');
     
     signaturePad = new SignaturePad(canvas, {
         backgroundColor: 'rgba(255, 255, 255, 1)',
         penColor: 'rgb(15, 23, 42)',
-        minWidth: 0.8, // Thinner stroke width
+        minWidth: 0.8,
         maxWidth: 2.2
     });
 }
@@ -255,7 +254,6 @@ async function unlockPegawaiSelectBox() {
     box.classList.remove('hidden');
     setTimeout(() => box.classList.remove('opacity-0'), 50);
 
-    // Smooth scroll directly to the select box
     box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     try {
@@ -264,7 +262,7 @@ async function unlockPegawaiSelectBox() {
         populatePegawaiDropdown(pegawaiDataList);
     } catch (err) {
         pegawaiDataList = [
-            { nama: "Drs. H. Ahmad Faisol, M.Si", nip: "19750812 199903 1 002", pangkatGol: "Pembina Utama Muda (IV/c)", jabatan: "Kepala Bagian Umum", lokasiKerja: "Kantor Bupati Pasuruan", kegiatan: "Koordinasi Protokol Pimpinan dan Penataan Administrasi Umum" }
+            { nama: "MOCH. YUNUS", nip: "197206252014061001", pangkatGol: "PENGATUR (II/c)", jabatan: "OPERATOR LAYANAN OPERASIONAL", lokasiKerja: "Kantor Bupati Pasuruan", kegiatan: "Melaksanakan layanan operasional keprotokolan kegiatan Bupati dan Wakil Bupati" }
         ];
         populatePegawaiDropdown(pegawaiDataList);
     }
@@ -342,7 +340,6 @@ function getLastDayOfMonth(bulanName, year) {
     return date.getDate();
 }
 
-// ELEGANT PROPORTIONAL PDF GENERATION
 async function handleExportPDF(actionType) {
     if (!signaturePad || signaturePad.isEmpty()) {
         alert("Harap masukkan tanda tangan terlebih dahulu.");
@@ -372,7 +369,7 @@ async function handleExportPDF(actionType) {
         document.getElementById('pdf-val-nip').textContent = selectedPegawai.nip;
         document.getElementById('pdf-val-pangkat').textContent = selectedPegawai.pangkatGol;
         document.getElementById('pdf-val-jabatan').textContent = selectedPegawai.jabatan;
-        document.getElementById('pdf-val-periode').textContent = `${bulanLaporFull} (Triwulan ${triwulan})`;
+        document.getElementById('pdf-val-periode').textContent = `${bulanLaporFull} (TRIWULAN ${triwulan})`;
         document.getElementById('pdf-val-periode-p2').textContent = `Periode: ${bulanLaporFull}`;
 
         document.getElementById('pdf-val-tanggal').textContent = `Pasuruan, ${lastDay} ${bulan} 2026`;
@@ -380,7 +377,7 @@ async function handleExportPDF(actionType) {
         document.getElementById('pdf-val-ttd-nip').textContent = `NIP. ${selectedPegawai.nip}`;
         document.getElementById('pdf-img-sig').src = signaturePad.toDataURL();
 
-        // Render Minggu I & II (Page 1)
+        // Render Minggu I & II (Halaman 1)
         const mingguListP1 = document.getElementById('pdf-minggu-list');
         mingguListP1.innerHTML = '';
         for (let i = 1; i <= 2; i++) {
@@ -388,9 +385,41 @@ async function handleExportPDF(actionType) {
             const img2 = photoStorage[`m${i}_f2`] || '';
 
             mingguListP1.innerHTML += `
-                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                    <!-- Rounded Green Box Header -->
-                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <!-- Full Width Center Green Badge Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 9.5px; font-weight: 700; padding: 3px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 6px; text-transform: uppercase;">
+                        Minggu ${getRoman(i)} - (${bulanLaporFull})
+                    </div>
+                    
+                    <div style="font-size: 9.5px; color: #374151; line-height: 1.35; margin-bottom: 6px;">
+                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
+                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
+                    </div>
+
+                    <!-- Reduced Height Proportional Photos Grid (max-height: 110px) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="height: 110px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 8.5px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                        </div>
+                        <div style="height: 110px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 8.5px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Minggu III & IV (Halaman 2)
+        const mingguListP2 = document.getElementById('pdf-minggu-list-page2');
+        mingguListP2.innerHTML = '';
+        for (let i = 3; i <= 4; i++) {
+            const img1 = photoStorage[`m${i}_f1`] || '';
+            const img2 = photoStorage[`m${i}_f2`] || '';
+
+            mingguListP2.innerHTML += `
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <!-- Full Width Center Green Badge Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 8px; text-transform: uppercase;">
                         Minggu ${getRoman(i)} - (${bulanLaporFull})
                     </div>
                     
@@ -399,45 +428,13 @@ async function handleExportPDF(actionType) {
                         <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
                     </div>
 
-                    <!-- 4:3 Ratio Photos Grid -->
+                    <!-- Reduced Height Proportional Photos Grid (max-height: 135px) -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                        <div style="height: 135px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        // Render Minggu III & IV (Page 2)
-        const mingguListP2 = document.getElementById('pdf-minggu-list-page2');
-        mingguListP2.innerHTML = '';
-        for (let i = 3; i <= 4; i++) {
-            const img1 = photoStorage[`m${i}_f1`] || '';
-            const img2 = photoStorage[`m${i}_f2`] || '';
-
-            mingguListP2.innerHTML += `
-                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-                    <!-- Rounded Green Box Header -->
-                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
-                        Minggu ${getRoman(i)} - (${bulanLaporFull})
-                    </div>
-                    
-                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 10px;">
-                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
-                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
-                    </div>
-
-                    <!-- 4:3 Ratio Photos Grid -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
-                        </div>
-                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        <div style="height: 135px; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; items-center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
@@ -448,10 +445,10 @@ async function handleExportPDF(actionType) {
         logRiwayatToGAS(selectedPegawai.nama, bulan, status);
 
         const element = document.getElementById('pdf-template');
-        // NAMA - BULAN LAPOR TAHUN filename format
         const cleanNama = selectedPegawai.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim();
         const filename = `${cleanNama} - ${bulan.toUpperCase()} 2026.pdf`;
 
+        // Exact html2pdf config to prevent extra blank pages
         const opt = {
             margin: 0,
             filename: filename,

@@ -16,10 +16,6 @@ body {
     object-fit: cover;
 }
 
-.page-break-before {
-    page-break-before: always;
-}
-
 #signature-pad {
     touch-action: none;
 }
