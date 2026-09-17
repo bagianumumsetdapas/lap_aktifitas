@@ -5,7 +5,7 @@ const GAS_API_URL = "https://script.google.com/macros/s/AKfycbw4gcxXaIm5MzRs4hfZ
 let pegawaiDataList = [];
 let selectedPegawai = null;
 let signaturePad = null;
-const photoStorage = {}; // { 'm1_f1': base64Data, ... }
+const photoStorage = {}; 
 
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
@@ -15,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
     checkNetworkStatus();
 });
 
-// Auto Dark/Light Theme based on hour (Default: Dark 18:00 - 06:00, Light 06:00 - 18:00)
 function initTheme() {
     const hour = new Date().getHours();
     const isNight = hour < 6 || hour >= 18;
@@ -47,7 +46,6 @@ function setTheme(mode) {
     }
 }
 
-// 1. PIN Access Input Management
 function initPinInputs() {
     const inputs = document.querySelectorAll('.pin-input');
     inputs.forEach((input, idx) => {
@@ -71,7 +69,6 @@ function getEnteredPin() {
     return pin;
 }
 
-// 2. Network Check
 function checkNetworkStatus() {
     const badge = document.getElementById('status-badge');
     const update = () => {
@@ -88,34 +85,18 @@ function checkNetworkStatus() {
     update();
 }
 
-// 3. Signature Pad Init - Correct Sizing & Touch Support
+// Fine stroke width for refined signatures
 function initSignaturePad() {
     const canvas = document.getElementById('signature-pad');
-    
-    function resizeCanvas() {
-        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-        canvas.width = canvas.offsetWidth * ratio;
-        canvas.height = canvas.offsetHeight * ratio;
-        const ctx = canvas.getContext("2d");
-        ctx.scale(ratio, ratio);
-        if (signaturePad) {
-            const data = signaturePad.toData();
-            signaturePad.clear();
-            signaturePad.fromData(data);
-        }
-    }
     
     signaturePad = new SignaturePad(canvas, {
         backgroundColor: 'rgba(255, 255, 255, 1)',
         penColor: 'rgb(15, 23, 42)',
-        minWidth: 0.5,
-        maxWidth: 1.5
+        minWidth: 0.8, // Thinner stroke width
+        maxWidth: 2.2
     });
-
-    window.addEventListener("resize", resizeCanvas);
 }
 
-// 4. Render 4 Minggu Upload Boxes
 function renderMingguBoxes() {
     const container = document.getElementById('minggu-container');
     const template = document.getElementById('tpl-minggu');
@@ -199,7 +180,6 @@ function compressAndResizeImage(file, maxWidth, maxHeight, quality) {
     });
 }
 
-// 5. Event Listeners Setup
 function setupEventListeners() {
     document.getElementById('btn-verify').addEventListener('click', async () => {
         const pin = getEnteredPin();
@@ -275,6 +255,9 @@ async function unlockPegawaiSelectBox() {
     box.classList.remove('hidden');
     setTimeout(() => box.classList.remove('opacity-0'), 50);
 
+    // Smooth scroll directly to the select box
+    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
     try {
         const res = await fetch(`${GAS_API_URL}?action=getPegawai`);
         pegawaiDataList = await res.json();
@@ -332,17 +315,19 @@ function showReportSection() {
     const lastDay = getLastDayOfMonth(bulan, 2026);
     document.getElementById('text-tanggal').textContent = `Pasuruan, ${lastDay} ${bulan} 2026`;
 
-    // Re-initialize canvas layout after becoming visible
     setTimeout(() => {
         const canvas = document.getElementById('signature-pad');
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        canvas.width = canvas.offsetWidth * ratio;
+        canvas.height = canvas.offsetHeight * ratio;
+        canvas.getContext("2d").scale(ratio, ratio);
+        
         if (!signaturePad) {
             signaturePad = new SignaturePad(canvas, {
                 backgroundColor: 'rgba(255, 255, 255, 1)',
                 penColor: 'rgb(15, 23, 42)',
-                minWidth: 1.5,
-                maxWidth: 3.5
+                minWidth: 0.8,
+                maxWidth: 2.2
             });
         } else {
             signaturePad.clear();
@@ -357,7 +342,7 @@ function getLastDayOfMonth(bulanName, year) {
     return date.getDate();
 }
 
-// FIX PDF GENERATION & EXPORT FUNCTION
+// ELEGANT PROPORTIONAL PDF GENERATION
 async function handleExportPDF(actionType) {
     if (!signaturePad || signaturePad.isEmpty()) {
         alert("Harap masukkan tanda tangan terlebih dahulu.");
@@ -377,46 +362,81 @@ async function handleExportPDF(actionType) {
     try {
         const bulan = document.getElementById('select-bulan').value;
         const triwulan = document.getElementById('select-triwulan').value;
-        const kegiatanMaster = document.getElementById('input-kegiatan').value;
+        const kegiatanMaster = document.getElementById('input-kegiatan').value || '-';
+        const lokasiMaster = document.getElementById('input-lokasi').value || '-';
         const lastDay = getLastDayOfMonth(bulan, 2026);
+        const bulanLaporFull = `${bulan} 2026`;
 
+        // Populate Identitas
         document.getElementById('pdf-val-nama').textContent = selectedPegawai.nama;
         document.getElementById('pdf-val-nip').textContent = selectedPegawai.nip;
         document.getElementById('pdf-val-pangkat').textContent = selectedPegawai.pangkatGol;
         document.getElementById('pdf-val-jabatan').textContent = selectedPegawai.jabatan;
-        document.getElementById('pdf-val-periode').textContent = `${bulan} (Triwulan ${triwulan})`;
-        document.getElementById('pdf-val-lokasi').textContent = document.getElementById('input-lokasi').value;
+        document.getElementById('pdf-val-periode').textContent = `${bulanLaporFull} (Triwulan ${triwulan})`;
+        document.getElementById('pdf-val-periode-p2').textContent = `Periode: ${bulanLaporFull}`;
 
         document.getElementById('pdf-val-tanggal').textContent = `Pasuruan, ${lastDay} ${bulan} 2026`;
         document.getElementById('pdf-val-ttd-nama').textContent = selectedPegawai.nama;
         document.getElementById('pdf-val-ttd-nip').textContent = `NIP. ${selectedPegawai.nip}`;
         document.getElementById('pdf-img-sig').src = signaturePad.toDataURL();
 
-        const tbody = document.getElementById('pdf-kegiatan-rows');
-        tbody.innerHTML = '';
-        for (let i = 1; i <= 4; i++) {
-            tbody.innerHTML += `
-                <tr>
-                    <td style="padding: 6px 8px; border: 1px solid #d1d5db; text-align: center; font-weight: 600;">${i}</td>
-                    <td style="padding: 6px 8px; border: 1px solid #d1d5db;">${kegiatanMaster} (Minggu ke-${i})</td>
-                </tr>
-            `;
-        }
-
-        const fotoGrid = document.getElementById('pdf-foto-grid');
-        fotoGrid.innerHTML = '';
-        for (let i = 1; i <= 4; i++) {
+        // Render Minggu I & II (Page 1)
+        const mingguListP1 = document.getElementById('pdf-minggu-list');
+        mingguListP1.innerHTML = '';
+        for (let i = 1; i <= 2; i++) {
             const img1 = photoStorage[`m${i}_f1`] || '';
             const img2 = photoStorage[`m${i}_f2`] || '';
 
-            fotoGrid.innerHTML += `
-                <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; background-color: #f9fafb;">
-                    <span style="font-size: 10px; font-weight: 700; color: #065f46; text-transform: uppercase; display: block; margin-bottom: 4px;">Minggu Ke-${i}</span>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div style="height: 110px; background-color: #e5e7eb; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db;">
+            mingguListP1.innerHTML += `
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                    <!-- Rounded Green Box Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 6px;">
+                        Minggu ${getRoman(i)} - (${bulanLaporFull})
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 8px;">
+                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
+                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
+                    </div>
+
+                    <!-- 4:3 Ratio Photos Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
                             ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height: 110px; background-color: #e5e7eb; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db;">
+                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render Minggu III & IV (Page 2)
+        const mingguListP2 = document.getElementById('pdf-minggu-list-page2');
+        mingguListP2.innerHTML = '';
+        for (let i = 3; i <= 4; i++) {
+            const img1 = photoStorage[`m${i}_f1`] || '';
+            const img2 = photoStorage[`m${i}_f2`] || '';
+
+            mingguListP2.innerHTML += `
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                    <!-- Rounded Green Box Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 8px;">
+                        Minggu ${getRoman(i)} - (${bulanLaporFull})
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 10px;">
+                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
+                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
+                    </div>
+
+                    <!-- 4:3 Ratio Photos Grid -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                        </div>
+                        <div style="aspect-ratio: 4/3; background-color: #f3f4f6; border-radius: 8px; overflow: hidden; border: 1px solid #d1d5db;">
                             ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="height: 100%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
@@ -428,7 +448,9 @@ async function handleExportPDF(actionType) {
         logRiwayatToGAS(selectedPegawai.nama, bulan, status);
 
         const element = document.getElementById('pdf-template');
-        const filename = `Laporan_Aktivitas_${selectedPegawai.nama.replace(/[^a-zA-Z0-9]/g, '_')}_${bulan}.pdf`;
+        // NAMA - BULAN LAPOR TAHUN filename format
+        const cleanNama = selectedPegawai.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+        const filename = `${cleanNama} - ${bulan.toUpperCase()} 2026.pdf`;
 
         const opt = {
             margin: 0,
@@ -464,6 +486,11 @@ async function handleExportPDF(actionType) {
         btnDownload.innerHTML = origDownloadText;
         btnShare.innerHTML = origShareText;
     }
+}
+
+function getRoman(num) {
+    const map = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
+    return map[num] || num;
 }
 
 async function logRiwayatToGAS(nama, bulan, status) {

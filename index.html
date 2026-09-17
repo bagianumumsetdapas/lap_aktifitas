@@ -89,7 +89,7 @@
             </div>
 
             <!-- Form Pilihan Pegawai (Inisial tersembunyi sampai Passcode valid) -->
-            <div id="pegawai-select-box" class="space-y-4 hidden opacity-0 transition-all duration-500 bg-white dark:bg-gray-800/80 p-6 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-sm">
+            <div id="pegawai-select-box" class="space-y-4 hidden opacity-0 transition-all duration-500 bg-white dark:bg-gray-800/80 p-6 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-sm scroll-mt-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="md:col-span-3">
                         <label class="block text-xs font-semibold mb-1.5 text-gray-700 dark:text-gray-300">Nama Pegawai (Sesuai Database)</label>
@@ -193,7 +193,7 @@
                 </div>
             </div>
 
-            <!-- Tanda Tangan Canvas -->
+            <!-- Tanda Tangan Canvas (Lebih Tinggi) -->
             <div class="bg-white dark:bg-gray-800/80 p-5 rounded-2xl border border-emerald-100 dark:border-gray-700 shadow-sm space-y-2">
                 <div class="flex items-center justify-between">
                     <label class="text-xs font-semibold text-gray-700 dark:text-gray-300">Tanda Tangan Digital (Layar Sentuh / Mouse)</label>
@@ -201,7 +201,8 @@
                         <i class="fa-solid fa-rotate-left"></i> Bersihkan Pad
                     </button>
                 </div>
-                <div class="bg-gray-50 dark:bg-white rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 h-40 relative">
+                <!-- Signature Pad Height Improved to h-48 -->
+                <div class="bg-gray-50 dark:bg-white rounded-xl overflow-hidden border border-gray-300 dark:border-gray-600 h-48 relative">
                     <canvas id="signature-pad" class="w-full h-full cursor-crosshair touch-none"></canvas>
                 </div>
                 <p id="text-tanggal" class="text-right text-xs text-gray-600 dark:text-gray-400 italic">Pasuruan, -- Month 2026</p>
@@ -223,97 +224,104 @@
 
     </div>
 
-    <!-- PREVIEW PDF TEMPLATE FOR PRINTING & EXPORT -->
+    <!-- PREVIEW PDF TEMPLATE FOR PRINTING & EXPORT (ELEGAN A4 LAYOUT) -->
     <div id="pdf-template-wrapper" style="position: absolute; left: -9999px; top: 0;">
-        <div id="pdf-template" style="width: 210mm; background-color: #ffffff; color: #000000; padding: 12mm; font-family: 'Poppins', sans-serif;">
+        <div id="pdf-template" style="width: 210mm; background-color: #ffffff; color: #1f2937; padding: 10mm 15mm; font-family: 'Poppins', sans-serif; box-sizing: border-box;">
             
             <!-- PAGE 1: DOKUMEN LAPORAN -->
-            <div style="min-height: 265mm; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="height: 275mm; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
                 <div>
-                    <!-- Header Kop -->
-                    <div style="display: flex; align-items: center; gap: 16px; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
-                        <img id="pdf-logo" src="images/Lambang_Kabupaten_Pasuruan.png" style="width: 56px; height: 72px; object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Lambang_Kabupaten_Pasuruan.png/400px-Lambang_Kabupaten_Pasuruan.png'">
-                        <div style="text-align: center; flex: 1;">
-                            <h2 style="font-size: 13px; font-weight: 700; text-transform: uppercase; margin: 0; line-height: 1.2;">PEMERINTAH KABUPATEN PASURUAN</h2>
-                            <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #065f46; margin: 2px 0 0 0; line-height: 1.2;">BAGIAN UMUM, PROTOKOL DAN KOMUNIKASI PIMPINAN</h3>
-                            <p style="font-size: 9px; color: #4b5563; margin: 2px 0 0 0;">Jl. Hayam Wuruk No.14 Pasuruan, Jawa Timur 67111</p>
+                    <!-- Header Kop PDF Elegan -->
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 2.5px solid #065f46; padding-bottom: 10px; margin-bottom: 16px;">
+                        <img id="pdf-logo" src="images/Lambang_Kabupaten_Pasuruan.png" style="width: 52px; height: 68px; object-fit: contain;" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Lambang_Kabupaten_Pasuruan.png/400px-Lambang_Kabupaten_Pasuruan.png'">
+                        <div style="text-align: center;">
+                            <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; color: #064e3b; margin: 0; tracking: 0.5px;">LAPORAN AKTIFITAS PEGAWAI</h2>
+                            <h3 style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #047857; margin: 2px 0 0 0;">Bagian Umum, Protokol dan Komunikasi Pimpinan</h3>
+                            <p style="font-size: 10px; color: #374151; font-weight: 500; margin: 1px 0 0 0;">Sekretariat Daerah Kabupaten Pasuruan</p>
                         </div>
                     </div>
 
-                    <h4 style="text-align: center; font-weight: 700; font-size: 13px; color: #064e3b; text-transform: uppercase; text-decoration: underline; margin-bottom: 16px;">LAPORAN AKTIVITAS PEGAWAI</h4>
-
-                    <!-- Tabel Identitas Pegawai -->
-                    <table style="width: 100%; font-size: 11px; border-collapse: collapse; margin-bottom: 16px;">
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db; width: 28%;">Nama Pegawai</td>
-                            <td id="pdf-val-nama" style="padding: 6px 8px; border: 1px solid #d1d5db; font-weight: 500;"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db;">NIP</td>
-                            <td id="pdf-val-nip" style="padding: 6px 8px; border: 1px solid #d1d5db;"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db;">Pangkat / Golongan</td>
-                            <td id="pdf-val-pangkat" style="padding: 6px 8px; border: 1px solid #d1d5db;"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db;">Jabatan</td>
-                            <td id="pdf-val-jabatan" style="padding: 6px 8px; border: 1px solid #d1d5db;"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db;">Bulan / Triwulan</td>
-                            <td id="pdf-val-periode" style="padding: 6px 8px; border: 1px solid #d1d5db;"></td>
-                        </tr>
-                        <tr>
-                            <td style="background-color: #f3f4f6; padding: 6px 8px; font-weight: 600; border: 1px solid #d1d5db;">Lokasi Kerja</td>
-                            <td id="pdf-val-lokasi" style="padding: 6px 8px; border: 1px solid #d1d5db;"></td>
-                        </tr>
-                    </table>
-
-                    <!-- Tabel Aktivitas Ringkas -->
-                    <table style="width: 100%; font-size: 11px; border-collapse: collapse; margin-bottom: 16px;">
-                        <thead>
-                            <tr style="background-color: #065f46; color: #ffffff;">
-                                <th style="padding: 6px 8px; border: 1px solid #d1d5db; width: 50px; text-align: center;">Minggu</th>
-                                <th style="padding: 6px 8px; border: 1px solid #d1d5db; text-align: left;">Uraian Aktivitas Pekerjaan</th>
+                    <!-- Identitas Pegawai Table-like Grid Elegan -->
+                    <div style="background-color: #f0fdf4; border: 1px solid #a7f3d0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+                        <table style="width: 100%; font-size: 11px; border-collapse: collapse; line-height: 1.6;">
+                            <tr>
+                                <td style="width: 24%; font-weight: 600; color: #065f46;">Nama</td>
+                                <td style="width: 3%; font-weight: 600; color: #065f46;">:</td>
+                                <td id="pdf-val-nama" style="font-weight: 600; color: #111827;"></td>
                             </tr>
-                        </thead>
-                        <tbody id="pdf-kegiatan-rows">
-                            <!-- Populated in JS -->
-                        </tbody>
-                    </table>
-                </div>
+                            <tr>
+                                <td style="font-weight: 600; color: #065f46;">NIP</td>
+                                <td style="font-weight: 600; color: #065f46;">:</td>
+                                <td id="pdf-val-nip" style="color: #374151;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: #065f46;">Pangkat/Gol</td>
+                                <td style="font-weight: 600; color: #065f46;">:</td>
+                                <td id="pdf-val-pangkat" style="color: #374151;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: #065f46;">Jabatan</td>
+                                <td style="font-weight: 600; color: #065f46;">:</td>
+                                <td id="pdf-val-jabatan" style="color: #374151;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; color: #065f46;">Bulan Lapor</td>
+                                <td style="font-weight: 600; color: #065f46;">:</td>
+                                <td id="pdf-val-periode" style="font-weight: 700; color: #064e3b; text-transform: uppercase;"></td>
+                            </tr>
+                        </table>
+                    </div>
 
-                <!-- Section Tanda Tangan -->
-                <div style="display: flex; justify-content: flex-end; padding-top: 12px;">
-                    <div style="text-align: center; width: 220px;">
-                        <p id="pdf-val-tanggal" style="font-size: 11px; margin-bottom: 4px;">Pasuruan, -- ---- 2026</p>
-                        <p style="font-size: 11px; font-weight: 600; margin: 0;">Pegawai Yang Melaporkan,</p>
-                        <div style="height: 70px; display: flex; align-items: center; justify-content: center; margin: 4px 0;">
-                            <img id="pdf-img-sig" style="max-height: 70px; max-width: 100%; object-fit: contain;">
-                        </div>
-                        <p id="pdf-val-ttd-nama" style="font-size: 11px; font-weight: 700; text-decoration: underline; margin: 0;">NAMA PEGAWAI</p>
-                        <p id="pdf-val-ttd-nip" style="font-size: 10px; color: #374151; margin: 2px 0 0 0;">NIP. -</p>
+                    <div style="border-bottom: 1px dashed #cbd5e1; margin-bottom: 16px;"></div>
+
+                    <!-- Ringkasan Aktivitas & Foto Minggu I sd. IV -->
+                    <div id="pdf-minggu-list" style="display: flex; flex-direction: column; gap: 14px;">
+                        <!-- Rendered dynamically for Minggu I - IV -->
                     </div>
                 </div>
-            </div>
 
-            <!-- PAGE 2: LAMPIRAN FOTO MINGGUAN -->
-            <div class="page-break-before" style="min-height: 265mm; padding-top: 16px; display: flex; flex-direction: column; justify-content: space-between;">
+                <!-- Footer Tanda Tangan & Halaman 1/2 -->
                 <div>
-                    <h4 style="font-size: 11px; font-weight: 700; color: #065f46; text-transform: uppercase; border-bottom: 2px solid #065f46; padding-bottom: 4px; margin-bottom: 16px;">
-                        LAMPIRAN DOKUMENTASI FOTO KEGIATAN MINGGUAN
-                    </h4>
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <div style="text-align: center; width: 220px;">
+                            <p id="pdf-val-tanggal" style="font-size: 11px; color: #374151; margin-bottom: 2px;">Pasuruan, -- ---- 2026</p>
+                            <p style="font-size: 11px; font-weight: 600; color: #111827; margin: 0;">Yang melaporkan,</p>
+                            <div style="height: 60px; display: flex; align-items: center; justify-content: center; margin: 2px 0;">
+                                <img id="pdf-img-sig" style="max-height: 60px; max-width: 100%; object-fit: contain;">
+                            </div>
+                            <p id="pdf-val-ttd-nama" style="font-size: 11px; font-weight: 700; color: #064e3b; text-decoration: underline; margin: 0;">NAMA PEGAWAI</p>
+                            <p id="pdf-val-ttd-nip" style="font-size: 10px; color: #4b5563; margin: 1px 0 0 0;">NIP. -</p>
+                        </div>
+                    </div>
 
-                    <div id="pdf-foto-grid" style="display: flex; flex-direction: column; gap: 12px;">
-                        <!-- 4 Pasang Foto Mingguan (Rendered via JS) -->
+                    <div style="display: flex; justify-content: justify-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 9px; color: #9ca3af;">
+                        <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
+                        <span style="font-weight: 600; color: #4b5563;">Halaman 1/2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: LANJUTAN FOTO MINGGU III & IV / LAMPIRAN FULL -->
+            <div class="page-break-before" style="height: 275mm; display: flex; flex-direction: column; justify-content: space-between; padding-top: 10mm; box-sizing: border-box;">
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #065f46; padding-bottom: 6px; margin-bottom: 16px;">
+                        <h4 style="font-size: 11px; font-weight: 700; color: #064e3b; text-transform: uppercase; margin: 0;">
+                            LAMPIRAN DOKUMENTASI FOTO MINGGU III & IV
+                        </h4>
+                        <span id="pdf-val-periode-p2" style="font-size: 10px; font-weight: 600; color: #047857;"></span>
+                    </div>
+
+                    <div id="pdf-minggu-list-page2" style="display: flex; flex-direction: column; gap: 16px;">
+                        <!-- Rendered dynamically for Page 2 -->
                     </div>
                 </div>
 
-                <div style="text-align: right; font-size: 8px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 8px;">
-                    Dokumen ini dibuat menggunakan Sistem Laporan Aktivitas Pegawai - Kabupaten Pasuruan
+                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #e5e7eb; padding-top: 6px; font-size: 9px; color: #9ca3af;">
+                    <span>Bagian Umum, Protokol dan Komunikasi Pimpinan Kab. Pasuruan</span>
+                    <span style="font-weight: 600; color: #4b5563;">Halaman 2/2</span>
                 </div>
             </div>
+
         </div>
     </div>
 
