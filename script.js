@@ -122,7 +122,7 @@ function setupPhotoBox(box, photoKey) {
         const file = e.target.files[0];
         if (!file) return;
 
-        const compressedBase64 = await compressAndResizeImage(file, 800, 800, 0.65);
+        const compressedBase64 = await compressAndResizeImage(file, 800, 600, 0.7);
         photoStorage[photoKey] = compressedBase64;
 
         preview.src = compressedBase64;
@@ -145,46 +145,37 @@ function setupPhotoBox(box, photoKey) {
 }
 
 function compressAndResizeImage(file, maxWidth, maxHeight, quality) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const reader = new FileReader();
-
-        reader.onerror = () => reject(new Error("Gagal membaca foto."));
+        reader.readAsDataURL(file);
         reader.onload = (event) => {
             const img = new Image();
-
-            img.onerror = () => reject(new Error("Format foto tidak dapat diproses."));
+            img.src = event.target.result;
             img.onload = () => {
-                let width = img.naturalWidth || img.width;
-                let height = img.naturalHeight || img.height;
-
-                // Pertahankan rasio asli foto.
-                const scale = Math.min(
-                    1,
-                    maxWidth / width,
-                    maxHeight / height
-                );
-
-                width = Math.max(1, Math.round(width * scale));
-                height = Math.max(1, Math.round(height * scale));
-
                 const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+
                 canvas.width = width;
                 canvas.height = height;
-
-                const ctx = canvas.getContext('2d', { alpha: false });
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, width, height);
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
+                const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
                 resolve(canvas.toDataURL('image/jpeg', quality));
             };
-
-            img.src = event.target.result;
         };
-
-        reader.readAsDataURL(file);
     });
 }
 
@@ -355,11 +346,6 @@ async function handleExportPDF(actionType) {
         return;
     }
 
-    if (typeof html2pdf === 'undefined') {
-        alert("Library PDF belum termuat. Silakan refresh halaman lalu coba lagi.");
-        return;
-    }
-
     const btnDownload = document.getElementById('btn-download');
     const btnShare = document.getElementById('btn-share');
     const origDownloadText = btnDownload.innerHTML;
@@ -370,20 +356,6 @@ async function handleExportPDF(actionType) {
     btnDownload.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses...`;
     btnShare.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Memproses...`;
 
-    const element = document.getElementById('pdf-template');
-
-    // Simpan style asli. Template PDF sebelumnya berada di luar layar,
-    // sehingga pada sebagian browser html2canvas bisa menghasilkan PDF kosong.
-    const originalStyle = {
-        position: element.style.position,
-        left: element.style.left,
-        top: element.style.top,
-        zIndex: element.style.zIndex,
-        display: element.style.display,
-        visibility: element.style.visibility,
-        width: element.style.width
-    };
-
     try {
         const bulan = document.getElementById('select-bulan').value;
         const triwulan = document.getElementById('select-triwulan').value;
@@ -392,194 +364,103 @@ async function handleExportPDF(actionType) {
         const lastDay = getLastDayOfMonth(bulan, 2026);
         const bulanLaporFull = `${bulan} 2026`;
 
-        if (!selectedPegawai) {
-            throw new Error("Data pegawai belum dipilih.");
-        }
+        // Populate Identitas
+        document.getElementById('pdf-val-nama').textContent = selectedPegawai.nama;
+        document.getElementById('pdf-val-nip').textContent = selectedPegawai.nip;
+        document.getElementById('pdf-val-pangkat').textContent = selectedPegawai.pangkatGol;
+        document.getElementById('pdf-val-jabatan').textContent = selectedPegawai.jabatan;
+        document.getElementById('pdf-val-periode').textContent = `${bulanLaporFull} (TRIWULAN ${triwulan})`;
+        document.getElementById('pdf-val-periode-p2').textContent = `Periode: ${bulanLaporFull}`;
 
-        // Populate identitas.
-        document.getElementById('pdf-val-nama').textContent = selectedPegawai.nama || '-';
-        document.getElementById('pdf-val-nip').textContent = selectedPegawai.nip || '-';
-        document.getElementById('pdf-val-pangkat').textContent = selectedPegawai.pangkatGol || '-';
-        document.getElementById('pdf-val-jabatan').textContent = selectedPegawai.jabatan || '-';
-        document.getElementById('pdf-val-periode').textContent =
-            `${bulanLaporFull} (TRIWULAN ${triwulan})`;
-        document.getElementById('pdf-val-periode-p2').textContent =
-            `Periode: ${bulanLaporFull}`;
+        document.getElementById('pdf-val-tanggal').textContent = `Pasuruan, ${lastDay} ${bulan} 2026`;
+        document.getElementById('pdf-val-ttd-nama').textContent = selectedPegawai.nama;
+        document.getElementById('pdf-val-ttd-nip').textContent = `NIP. ${selectedPegawai.nip}`;
+        document.getElementById('pdf-img-sig').src = signaturePad.toDataURL();
 
-        document.getElementById('pdf-val-tanggal').textContent =
-            `Pasuruan, ${lastDay} ${bulan} 2026`;
-        document.getElementById('pdf-val-ttd-nama').textContent =
-            selectedPegawai.nama || '-';
-        document.getElementById('pdf-val-ttd-nip').textContent =
-            `NIP. ${selectedPegawai.nip || '-'}`;
-        document.getElementById('pdf-img-sig').src = signaturePad.toDataURL('image/png');
-
-        // Escape teks supaya karakter HTML dari input tidak merusak template PDF.
-        const escapeHtml = (value) => String(value ?? '-')
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-
-        const safeKegiatan = escapeHtml(kegiatanMaster);
-        const safeLokasi = escapeHtml(lokasiMaster);
-        const safeBulan = escapeHtml(bulanLaporFull);
-
-        // Foto dalam frame: TIDAK di-crop dan TIDAK dipaksa melebar.
-        // max-width + max-height menjaga rasio asli foto.
-        const photoHtml = (src, label) => {
-            if (!src) {
-                return `<div style="font-size:9px;color:#9ca3af;font-style:italic;">${label} Belum Diunggah</div>`;
-            }
-
-            return `<img src="${src}"
-                style="display:block; max-width:100%; max-height:100%; width:auto; height:auto; object-fit:contain;"
-                alt="${label}">`;
-        };
-
-        // Render Minggu I & II.
+        // Render Minggu I & II (Halaman 1)
         const mingguListP1 = document.getElementById('pdf-minggu-list');
         mingguListP1.innerHTML = '';
-
         for (let i = 1; i <= 2; i++) {
             const img1 = photoStorage[`m${i}_f1`] || '';
             const img2 = photoStorage[`m${i}_f2`] || '';
 
             mingguListP1.innerHTML += `
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;
-                            padding:8px 10px;box-sizing:border-box;
-                            page-break-inside:avoid;break-inside:avoid;">
-                    <div style="background:#059669;color:#fff;font-size:10px;font-weight:700;
-                                padding:4px 0;border-radius:5px;width:100%;text-align:center;
-                                margin-bottom:6px;text-transform:uppercase;">
-                        Minggu ${getRoman(i)} - (${safeBulan})
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <!-- Full Width Center Green Badge Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 8px; text-transform: uppercase;">
+                        Minggu ${getRoman(i)} - (${bulanLaporFull})
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 8px;">
+                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
+                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
                     </div>
 
-                    <div style="font-size:9.5px;color:#374151;line-height:1.3;margin-bottom:6px;">
-                        <div><strong>Kegiatan:</strong> ${safeKegiatan}</div>
-                        <div><strong>Lokasi:</strong> ${safeLokasi}</div>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <div style="height:112px;width:100%;box-sizing:border-box;background:#f3f4f6;
-                                    border-radius:6px;overflow:hidden;border:1px solid #d1d5db;
-                                    display:flex;align-items:center;justify-content:center;">
-                            ${photoHtml(img1, 'Foto 1')}
+                    <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height:112px;width:100%;box-sizing:border-box;background:#f3f4f6;
-                                    border-radius:6px;overflow:hidden;border:1px solid #d1d5db;
-                                    display:flex;align-items:center;justify-content:center;">
-                            ${photoHtml(img2, 'Foto 2')}
+                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // Render Minggu III & IV.
+        // Render Minggu III & IV (Halaman 2)
         const mingguListP2 = document.getElementById('pdf-minggu-list-page2');
         mingguListP2.innerHTML = '';
-
         for (let i = 3; i <= 4; i++) {
             const img1 = photoStorage[`m${i}_f1`] || '';
             const img2 = photoStorage[`m${i}_f2`] || '';
 
             mingguListP2.innerHTML += `
-                <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;
-                            padding:8px 10px;box-sizing:border-box;
-                            page-break-inside:avoid;break-inside:avoid;">
-                    <div style="background:#059669;color:#fff;font-size:10px;font-weight:700;
-                                padding:4px 0;border-radius:5px;width:100%;text-align:center;
-                                margin-bottom:6px;text-transform:uppercase;">
-                        Minggu ${getRoman(i)} - (${safeBulan})
+                <div style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                    <!-- Full Width Center Green Badge Header -->
+                    <div style="background-color: #059669; color: #ffffff; font-size: 10px; font-weight: 700; padding: 4px 0; border-radius: 5px; width: 100%; text-align: center; margin-bottom: 8px; text-transform: uppercase;">
+                        Minggu ${getRoman(i)} - (${bulanLaporFull})
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #374151; line-height: 1.4; margin-bottom: 8px;">
+                        <div><strong>Kegiatan:</strong> ${kegiatanMaster}</div>
+                        <div><strong>Lokasi:</strong> ${lokasiMaster}</div>
                     </div>
 
-                    <div style="font-size:9.5px;color:#374151;line-height:1.3;margin-bottom:6px;">
-                        <div><strong>Kegiatan:</strong> ${safeKegiatan}</div>
-                        <div><strong>Lokasi:</strong> ${safeLokasi}</div>
-                    </div>
-
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                        <div style="height:108px;width:100%;box-sizing:border-box;background:#f3f4f6;
-                                    border-radius:6px;overflow:hidden;border:1px solid #d1d5db;
-                                    display:flex;align-items:center;justify-content:center;">
-                            ${photoHtml(img1, 'Foto 1')}
+                    <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height:108px;width:100%;box-sizing:border-box;background:#f3f4f6;
-                                    border-radius:6px;overflow:hidden;border:1px solid #d1d5db;
-                                    display:flex;align-items:center;justify-content:center;">
-                            ${photoHtml(img2, 'Foto 2')}
+                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
             `;
         }
 
-        // Pastikan browser selesai layout dan semua gambar template selesai dimuat.
-        element.style.position = 'absolute';
-        element.style.left = '0';
-        element.style.top = '0';
-        element.style.zIndex = '-1';
-        element.style.display = 'block';
-        element.style.visibility = 'visible';
-        element.style.width = '215mm';
+        const status = actionType === 'download' ? 'Terunduh' : 'Tershare';
+        logRiwayatToGAS(selectedPegawai.nama, bulan, status);
 
-        const pdfImages = Array.from(element.querySelectorAll('img'));
-        await Promise.all(pdfImages.map(img => {
-            if (img.complete) return Promise.resolve();
-            return new Promise(resolve => {
-                img.onload = resolve;
-                img.onerror = resolve;
-            });
-        }));
+        const element = document.getElementById('pdf-template');
+        const cleanNama = selectedPegawai.nama.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+        const filename = `${cleanNama} - ${bulan.toUpperCase()} 2026.pdf`;
 
-        await new Promise(resolve => requestAnimationFrame(() => {
-            requestAnimationFrame(resolve);
-        }));
-
-        const cleanNama = (selectedPegawai.nama || 'Pegawai')
-            .replace(/[^a-zA-Z0-9 ]/g, '')
-            .trim();
-        const filename = `${cleanNama || 'Pegawai'} - ${bulan.toUpperCase()} 2026.pdf`;
-
+        // Exact F4 Paper Size (215mm x 330mm)
         const opt = {
             margin: 0,
             filename: filename,
-            image: {
-                type: 'jpeg',
-                quality: 0.88
-            },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                allowTaint: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                imageTimeout: 15000,
-                scrollX: 0,
-                scrollY: 0
-            },
-            jsPDF: {
-                unit: 'mm',
-                format: [215, 330],
-                orientation: 'portrait',
-                compress: true
-            },
-            pagebreak: {
-                mode: ['css', 'legacy'],
-                before: '.pdf-page-break-before',
-                after: '.pdf-page-break-after',
-                avoid: ['.pdf-week-card']
-            }
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF: { unit: 'mm', format: [215, 330], orientation: 'portrait' }
         };
 
-        const worker = html2pdf().set(opt).from(element);
-
         if (actionType === 'download') {
-            await worker.save();
+            await html2pdf().set(opt).from(element).save();
         } else if (actionType === 'share') {
-            const pdfBlob = await worker.outputPdf('blob');
+            const pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
             const file = new File([pdfBlob], filename, { type: 'application/pdf' });
 
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -593,26 +474,10 @@ async function handleExportPDF(actionType) {
                 await html2pdf().set(opt).from(element).save();
             }
         }
-
-        logRiwayatToGAS(
-            selectedPegawai.nama,
-            bulan,
-            actionType === 'download' ? 'Terunduh' : 'Tershare'
-        );
-
     } catch (error) {
         console.error("Gagal membuat PDF:", error);
         alert("Terjadi kesalahan saat membuat file PDF: " + error.message);
     } finally {
-        // Kembalikan template ke posisi semula.
-        element.style.position = originalStyle.position;
-        element.style.left = originalStyle.left;
-        element.style.top = originalStyle.top;
-        element.style.zIndex = originalStyle.zIndex;
-        element.style.display = originalStyle.display;
-        element.style.visibility = originalStyle.visibility;
-        element.style.width = originalStyle.width;
-
         btnDownload.disabled = false;
         btnShare.disabled = false;
         btnDownload.innerHTML = origDownloadText;
