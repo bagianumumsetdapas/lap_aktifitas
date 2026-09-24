@@ -397,12 +397,12 @@ async function handleExportPDF(actionType) {
                     </div>
 
                     <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="height: 108px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center center; background:#f8fafc;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height: 135px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        <div style="height: 108px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center center; background:#f8fafc;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
@@ -429,12 +429,12 @@ async function handleExportPDF(actionType) {
                     </div>
 
                     <!-- F4 Proportional Photos Grid (Crop Tengah - Center Center Object Fit Cover) -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
-                            ${img1 ? `<img src="${img1}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div style="height: 104px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img1 ? `<img src="${img1}" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center center; background:#f8fafc;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 1 Belum Diunggah</div>'}
                         </div>
-                        <div style="height: 130px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
-                            ${img2 ? `<img src="${img2}" style="width: 100%; height: 100%; object-fit: cover; object-position: center center;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
+                        <div style="height: 104px; width: 100%; background-color: #f3f4f6; border-radius: 6px; overflow: hidden; border: 1px solid #d1d5db; display: flex; align-items: center; justify-content: center;">
+                            ${img2 ? `<img src="${img2}" style="display:block; width:100%; height:100%; object-fit:contain; object-position:center center; background:#f8fafc;">` : '<div style="font-size: 9px; color: #9ca3af; font-style: italic;">Foto 2 Belum Diunggah</div>'}
                         </div>
                     </div>
                 </div>
@@ -453,7 +453,7 @@ async function handleExportPDF(actionType) {
             margin: 0,
             filename: filename,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
+            html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff", windowWidth: element.scrollWidth },
             jsPDF: { unit: 'mm', format: [215, 330], orientation: 'portrait' }
         };
 
